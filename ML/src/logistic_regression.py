@@ -4,7 +4,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import accuracy_score
-import helper_functions
+import HelperModule.helper_functions as helper_functions
 from sklearn .preprocessing import RobustScaler
 
 
