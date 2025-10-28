@@ -48,7 +48,7 @@ X_train ,X_val , y_train , y_val = train_test_split(
 
 classifier = TabPFNClassifier(device = "cuda" )
 
-print("Strating fitting ")
+print("Starting fitting ")
 classifier.fit(X_train , y_train)
 
 print("Predicting")

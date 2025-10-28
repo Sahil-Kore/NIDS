@@ -19,14 +19,12 @@ def get_df(sample_frac: float):
     
 
     final_df = pd.concat(df_list, axis=0, ignore_index=True)
-    print("num_labels prior ", final_df["Label"].unique() , final_df["Label"].nunique())
     label_counts = final_df["Label"].value_counts()
     least_frequent_labels = label_counts.nsmallest(5).index.tolist()
 
     new_label_col = final_df["Label"].copy()
     new_label_col.loc[final_df["Label"].isin(least_frequent_labels)] = "Other_attacks"    
     final_df["Label"] = new_label_col
-    print("num_labels prior ", final_df["Label"].unique() , final_df["Label"].nunique())
 
     return final_df
 
