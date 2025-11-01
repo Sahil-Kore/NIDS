@@ -1,0 +1,2 @@
+python3 download_dataset.py
+python3 merge_and_filter.py
