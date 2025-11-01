@@ -1,2 +1,3 @@
 python3 download_dataset.py
 python3 merge_and_filter.py
+python3 logistic_regression.py

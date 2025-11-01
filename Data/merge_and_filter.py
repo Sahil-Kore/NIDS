@@ -4,15 +4,14 @@ import os
 
 import seaborn as sns
 import matplotlib.pyplot as plt
-folder = "./Data/raw_data"
+folder = "./Data/raw_data/"
 search_pattern = os.path.join(folder , "*.parquet")
 all_files = glob.glob(search_pattern)
 
 df_list = [pd.read_parquet(file) for file in all_files]
 df = pd.concat(df_list , axis=0 , ignore_index= True)
-
-#selecting ssh-patator as the class whose data will be hidden while training
-test_label = "SSH-Patator"
+#selecting ftp-patator as the class whose data will be hidden while training
+test_label = "FTP-Patator"
 
 test_df = df[df["Label"] == test_label].copy()
 imbalanced_train_df = df[df["Label"] != test_label].copy()
@@ -66,5 +65,5 @@ os.makedirs("./Data/filtered_data/", exist_ok= True)
 
 # #saving the data
 filtered_train_df.to_parquet("./Data/filtered_data/train_data.parquet" )
-test_df.to_parquet("./Data/filtered_data/test_ssh-patator.parquet" )
+test_df.to_parquet("./Data/filtered_data/test_ftp-patator.parquet" )
 
