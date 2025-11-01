@@ -1,11 +1,13 @@
+import os 
+
 import numpy as np
 import pandas as pd
 import lightgbm as lgb
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
-train_val_df = pd.read_parquet("../..//Data/filtered_data/train_data.parquet")
-test_df = pd.read_parquet("../../Data/filtered_data/test_ftp-patator.parquet")
+train_val_df = pd.read_parquet("./Data/filtered_data/train_data.parquet")
+test_df = pd.read_parquet("./Data/filtered_data/test_ftp-patator.parquet")
 
 train_val_df = train_val_df.replace([np.inf, -np.inf], np.nan)
 test_df = test_df.replace([np.inf, -np.inf], np.nan)
@@ -23,11 +25,13 @@ kf = StratifiedKFold(n_splits=5)
 acc, prec, recall, f1 = [], [], [], []
 best_iterations = []
 
-for train_idx, val_idx in kf.split(X=X_train_val, y=y_train_val):
+for fold,(train_idx, val_idx )in enumerate(kf.split(X=X_train_val, y=y_train_val)):
+
     X_train, X_val = X_train_val.iloc[train_idx], X_train_val.iloc[val_idx]
     y_train, y_val = y_train_val.iloc[train_idx], y_train_val.iloc[val_idx]
 
     lgbm = lgb.LGBMClassifier(device='gpu', n_estimators=1000, objective='binary')
+
     lgbm.fit(X_train, y_train,
              eval_set=[(X_val, y_val)],
              eval_metric='binary_logloss',
@@ -49,13 +53,16 @@ for train_idx, val_idx in kf.split(X=X_train_val, y=y_train_val):
     recall.append(fold_recall)
     f1.append(fold_f1)
     
+    print(f"fold:{fold} val accuracy :{fold_acc:.4f} , val prec :{fold_prec:.4f},val recall :{fold_recall:.4f} , val f1:{fold_f1:.4f}")
+    
+
 avg_acc = np.mean(acc)
 avg_prec = np.mean(prec)
 avg_recall = np.mean(recall)
 avg_f1 = np.mean(f1)
 avg_best_iter = int(np.mean(best_iterations))
 
-print(f"LGBM average val accuracy :{avg_acc:.4f} , LGBM average val prec :{avg_prec:.4f}, LGBM average val recall :{avg_recall:.4f} , LGBM average val f1:{avg_f1:.4f}")
+print(f"average val accuracy :{avg_acc:.4f} , average val prec :{avg_prec:.4f}, average val recall :{avg_recall:.4f} , average val f1:{avg_f1:.4f}")
 print(f"Average best iteration from CV: {avg_best_iter}")
 
 final_lgbm = lgb.LGBMClassifier(device='gpu', n_estimators=avg_best_iter, objective='binary')
@@ -68,5 +75,11 @@ test_prec = precision_score(y_true=y_test, y_pred=y_test_preds)
 test_recall = recall_score(y_true=y_test, y_pred=y_test_preds)
 test_f1 = f1_score(y_true=y_test, y_pred=y_test_preds)
 
-print(f"LGBM Test accuracy :{test_acc:.4f} , LGBM Test prec :{test_prec:.4f}, LGBM Test recall :{test_recall:.4f} , LGBM Test f1:{test_f1:.4f}")
+print(f"Test accuracy :{test_acc:.4f} , Test prec :{test_prec:.4f}, Test recall :{test_recall:.4f} , Test f1:{test_f1:.4f}")
 
+model_dir = "./Training/ML/models"
+os.makedirs(model_dir,exist_ok= True)
+model_path = os.path.join(model_dir , "light_gbm.txt")
+final_lgbm.booster_.save_model(model_path)
+
+print(f"Saved model to {model_path}")

@@ -42,7 +42,7 @@ train_df_benign = train_df_benign.sample(n = sample_size ,random_state= 42)
 filtered_train_df = pd.concat([train_df_attack , train_df_benign] , axis = 0 , ignore_index= True)
 
 #shuffling the data
-filtered_train_df = filtered_train_df.sample(frac= 1.0 ).reset_index(drop= True)
+filtered_train_df = filtered_train_df.sample(frac= 1.0 ,random_state=42).reset_index(drop= True)
 
 # the train dataset is balanced now
 label_counts = filtered_train_df['Label'].value_counts()
